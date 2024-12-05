@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+networks:
+  tic-tac:
+    name: tic-tac
+    driver: bridge
+
+volumes:
+  pgdata:
