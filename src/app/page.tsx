@@ -1,18 +1,10 @@
-import { db } from "@/shared/lib/db";
-import { Button } from "@/shared/ui/button";
-import { Card, CardTitle } from "@/shared/ui/card";
+import { GamesList } from "@/features/games-list/server";
 
 export default async function Home() {
-  const games = await db.game.findMany();
-
   return (
-    <div>
-      <Button>Hello</Button>
-      {games.map((card) => (
-        <Card key={card.id}>
-          <CardTitle>{card.name}</CardTitle>
-        </Card>
-      ))}
+    <div className="flex flex-col gap-8 container mx-auto pt-[100px]">
+      <h1 className="text-4xl font-bold">Игры</h1>
+      <GamesList />
     </div>
   );
 }
