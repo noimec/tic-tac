@@ -1,4 +1,4 @@
-import { FormEventHandler, ReactNode } from "react";
+import { ReactNode } from "react";
 
 import {
   Card,
@@ -15,7 +15,7 @@ export function AuthFormLayout({
   fields,
   link,
   title,
-  onSubmit,
+  action,
   error,
 }: {
   title: string;
@@ -24,7 +24,7 @@ export function AuthFormLayout({
   actions: ReactNode;
   link: ReactNode;
   error: ReactNode;
-  onSubmit: FormEventHandler<HTMLFormElement>;
+  action: (formData: FormData) => void;
 }) {
   return (
     <Card className="w-full max-w-md">
@@ -35,7 +35,7 @@ export function AuthFormLayout({
         <CardDescription className="text-center">{description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form action={action} className="space-y-4">
           {fields}
           {error}
           {actions}
