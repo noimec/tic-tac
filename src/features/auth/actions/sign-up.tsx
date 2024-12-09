@@ -1,6 +1,9 @@
-import { z } from "zod";
+"use server";
 
-import { createUser } from "@/entities/user/server";
+import { z } from "zod";
+import { redirect } from "next/navigation";
+
+import { createUser, sessionService } from "@/entities/user/server";
 import { left, mapLeft } from "@/shared/lib/either";
 
 const formDataSchema = z.object({
@@ -17,6 +20,12 @@ export const signUpAction = async (state: unknown, formData: FormData) => {
   }
 
   const createUserResult = await createUser(result.data);
+
+  if (createUserResult.type === "right") {
+    await sessionService.addSession(createUserResult.value);
+
+    redirect("/");
+  }
 
   return mapLeft(createUserResult, (error) => {
     return {

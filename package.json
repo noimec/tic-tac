@@ -9,7 +9,8 @@
     "lint": "next lint",
     "db:reset": "dotenv -e .env.development -- npx prisma migrate reset",
     "db:migrate:dev": "dotenv -e .env.development -- npx prisma migrate dev",
-    "format": "npx prettier -w ."
+    "format": "npx prettier -w .",
+    "prepare": "husky install"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -38,11 +39,17 @@
     "dotenv-cli": "^7.4.4",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
     "postcss": "^8",
     "prettier": "^3.4.2",
     "prisma": "^6.0.1",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.19.2",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.ts": "eslint --cache --fix",
+    "*.{js,jsx,css,md,ts,tsx}": "prettier --write"
   }
 }
