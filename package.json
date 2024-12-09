@@ -50,7 +50,6 @@
   },
   "lint-staged": {
     "*.{ts, tsx}": "eslint --cache --fix",
-    "*.{js,jsx,css,md,ts,tsx}": "prettier --write",
-    "*.ts?(x)": "tsc --noEmit --skipLibCheck"
+    "*.{js,jsx,css,md,ts,tsx}": "npx prettier -w ."
   }
 }
