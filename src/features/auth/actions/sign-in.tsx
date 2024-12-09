@@ -4,19 +4,38 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 
 import { sessionService, verifyUserPassword } from "@/entities/user/server";
-import { left, mapLeft } from "@/shared/lib/either";
+
+export type SignInFormState = {
+  formData?: FormData;
+  errors?: {
+    login?: string;
+    password?: string;
+    _errors: string;
+  };
+};
 
 const formDataSchema = z.object({
   login: z.string().min(3),
   password: z.string().min(3),
 });
 
-export const signInAction = async (state: unknown, formData: FormData) => {
+export const signInAction = async (
+  state: SignInFormState,
+  formData: FormData,
+): Promise<SignInFormState> => {
   const data = Object.fromEntries(formData.entries());
   const result = formDataSchema.safeParse(data);
 
   if (!result.success) {
-    return left(`${result.error.message}`);
+    const formattedErrors = result.error.format();
+    return {
+      formData,
+      errors: {
+        login: formattedErrors.login?._errors.join(", "),
+        password: formattedErrors.password?._errors.join(", "),
+        _errors: formattedErrors._errors.join(", "),
+      },
+    };
   }
 
   const verifyUserResult = await verifyUserPassword(result.data);
@@ -27,10 +46,15 @@ export const signInAction = async (state: unknown, formData: FormData) => {
     redirect("/");
   }
 
-  return mapLeft(verifyUserResult, (error) => {
-    return {
-      "user-not-found": "Пользователь не найден",
-      "wrong-login-or-password": "Неверный логин или пароль",
-    }[error];
-  });
+  const errors = {
+    "user-not-found": "Пользователь не найден",
+    "wrong-login-or-password": "Неверный логин или пароль",
+  }[verifyUserResult.error];
+
+  return {
+    formData,
+    errors: {
+      _errors: errors,
+    },
+  };
 };

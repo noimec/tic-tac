@@ -4,19 +4,38 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 
 import { createUser, sessionService } from "@/entities/user/server";
-import { left, mapLeft } from "@/shared/lib/either";
+
+export type SignUpFormState = {
+  formData?: FormData;
+  errors?: {
+    login?: string;
+    password?: string;
+    _errors: string;
+  };
+};
 
 const formDataSchema = z.object({
   login: z.string().min(3),
   password: z.string().min(3),
 });
 
-export const signUpAction = async (state: unknown, formData: FormData) => {
+export const signUpAction = async (
+  state: SignUpFormState,
+  formData: FormData,
+): Promise<SignUpFormState> => {
   const data = Object.fromEntries(formData.entries());
   const result = formDataSchema.safeParse(data);
 
   if (!result.success) {
-    return left(`${result.error.message}`);
+    const formattedErrors = result.error.format();
+    return {
+      formData,
+      errors: {
+        login: formattedErrors.login?._errors.join(", "),
+        password: formattedErrors.password?._errors.join(", "),
+        _errors: formattedErrors._errors.join(", "),
+      },
+    };
   }
 
   const createUserResult = await createUser(result.data);
@@ -27,9 +46,14 @@ export const signUpAction = async (state: unknown, formData: FormData) => {
     redirect("/");
   }
 
-  return mapLeft(createUserResult, (error) => {
-    return {
-      "user-login-exists": "Пользователь с таким login существует",
-    }[error];
-  });
+  const errors = {
+    "user-login-exists": "Пользователь с таким логином существует",
+  }[createUserResult.error];
+
+  return {
+    formData,
+    errors: {
+      _errors: errors,
+    },
+  };
 };
