@@ -1,10 +1,11 @@
+import { redirect } from "next/navigation";
+
 import { GameClient } from "./game-client";
 import { gameEvents } from "../services/game-events";
 
 import { GameId } from "@/kernel/ids";
 import { getCurrentUser } from "@/entities/user/server";
 import { getGameById, startGame } from "@/entities/game/server";
-import { redirect } from "next/navigation";
 
 export async function Game({ gameId }: { gameId: GameId }) {
   const user = await getCurrentUser();
